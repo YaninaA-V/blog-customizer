@@ -29,17 +29,5 @@
 .bottomContainer {
 	display: flex;
 	justify-content: space-between;
-	margin-top: 157px;
+	margin-top: auto;
 }
-.overlay {
-	display: none;
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh; 
-  }
-  
-  .overlay_open {
-	display: block;
-  }

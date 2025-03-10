@@ -9,36 +9,30 @@ import styles from './app.module.css';
 
 export const App = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [articleState, setArticleState] = useState(defaultArticleState);
+	const [articleParams, setArticleParams] = useState(defaultArticleState);
 
-	const handleApply = (state: typeof defaultArticleState) => {
-		setArticleState(state);
+	const handleApply = (params: typeof defaultArticleState) => {
+		setArticleParams(params);
 		setIsOpen(false);
-	};
-
-	const handleReset = () => {
-		setArticleState(defaultArticleState);
-		setIsOpen(false);
-	};
+	};	
 
 	return (
 		<main
 			className={clsx(styles.main)}
 			style={
 				{
-					'--font-family': articleState.fontFamilyOption.value,
-					'--font-size': articleState.fontSizeOption.value,
-					'--font-color': articleState.fontColor.value,
-					'--container-width': articleState.contentWidth.value,
-					'--bg-color': articleState.backgroundColor.value,
+					'--font-family': articleParams.fontFamilyOption.value,
+					'--font-size': articleParams.fontSizeOption.value,
+					'--font-color': articleParams.fontColor.value,
+					'--container-width': articleParams.contentWidth.value,
+					'--bg-color': articleParams.backgroundColor.value,
 				} as CSSProperties
 			}>
 			<ArticleParamsForm
 				isOpen={isOpen}
 				toggleOpen={() => setIsOpen(!isOpen)}
-				updateSideBarState={articleState}
-				onApply={handleApply}
-				onReset={handleReset}
+				articleState={articleParams}
+				setArticleState={handleApply}			
 			/>
 			<Article />
 		</main>

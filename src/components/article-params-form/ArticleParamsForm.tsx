@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 
-import { ArrowButton } from 'src/components/arrow-button';
-import { Text } from '../text';
-import { Select } from '../select';
-import { RadioGroup } from '../radio-group';
-import { Separator } from '../separator';
-import { Button } from 'src/components/button';
+import { ArrowButton } from 'src/ui/arrow-button';
+import { Text } from '../../ui/text';
+import { Select } from '../../ui/select';
+import { RadioGroup } from '../../ui/radio-group';
+import { Separator } from '../../ui/separator';
+import { Button } from 'src/ui/button';
 
 import styles from './ArticleParamsForm.module.scss';
 import {
@@ -23,63 +23,67 @@ import {
 type TArticleParamsFormProps = {
 	toggleOpen: () => void;
 	isOpen: boolean;
-	updateSideBarState: ArticleStateType;
-	onApply: (state: ArticleStateType) => void;
-	onReset: () => void;
+	articleState: ArticleStateType;
+	setArticleState: (state: ArticleStateType) => void;
 };
 
 export const ArticleParamsForm = ({
 	toggleOpen,
 	isOpen,
-	updateSideBarState,
-	onApply,
-	onReset,
+	articleState,
+	setArticleState,
 }: TArticleParamsFormProps) => {
-	const [formState, setFormState] = useState(updateSideBarState);
+	const [formState, setFormState] = useState(articleState);
+	const asideRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		setFormState(updateSideBarState);
-	}, [updateSideBarState]);
+		if (!isOpen) return;
 
-	const handleSubmit = (e: React.FormEvent) => {
-		console.log(formState);
+		const handleClickOutside = (e: MouseEvent) => {		
+			if (
+				asideRef.current &&
+				!asideRef.current.contains(e.target as Node)
+			) {
+				toggleOpen();
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, [isOpen, toggleOpen]);
+
+	const handleSubmit = (e: React.FormEvent) => {		
 		e.preventDefault();
-		onApply(formState);
+		setArticleState(formState);
 	};
 
 	const handleReset = (e: React.FormEvent) => {
 		e.preventDefault();
 		setFormState(defaultArticleState);
-		onReset();
 	};
 
-	const handleChange = (articleName: string) => {
-		console.log(articleName);
-		return (value: OptionType) => {
-			setFormState((currentFormState) => ({
-				...currentFormState,
-				[articleName]: value,
-			}));
-		};
+	const handleChange = (name: keyof ArticleStateType) => (value: OptionType) => {
+		setFormState(prev => ({ ...prev, [name]:value}));
 	};
 
 	const asideClasses = clsx(styles.container, {
 		[styles.container_open]: isOpen,
 	});
 
+	const handleArrowClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation();
+		toggleOpen();
+	  };
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={toggleOpen} />
-			<div
-				onClick={toggleOpen}
-				className={clsx(styles.overlay, isOpen && styles.overlay_open)}
-			/>
-			<aside className={asideClasses}>
+			<aside ref={asideRef} className={asideClasses}>
 				<form
 					className={styles.form}
 					onSubmit={handleSubmit}
 					onReset={handleReset}>
-					<Text as='div' size={31} weight={800} uppercase={true} align='left'>
+					<Text as='h2' size={31} weight={800} uppercase={true} align='left'>
 						Задайте параметры
 					</Text>
 					<Select
