@@ -21,63 +21,53 @@ import {
 } from 'src/constants/articleProps';
 
 type TArticleParamsFormProps = {
-	toggleOpen: () => void;
-	isOpen: boolean;
 	articleState: ArticleStateType;
 	setArticleState: (state: ArticleStateType) => void;
 };
 
 export const ArticleParamsForm = ({
-	toggleOpen,
-	isOpen,
 	articleState,
 	setArticleState,
 }: TArticleParamsFormProps) => {
+	const [isOpen, setIsOpen] = useState(false);
 	const [formState, setFormState] = useState(articleState);
 	const asideRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (!isOpen) return;
 
-		const handleClickOutside = (e: MouseEvent) => {		
-			if (
-				asideRef.current &&
-				!asideRef.current.contains(e.target as Node)
-			) {
-				toggleOpen();
+		const handleClickOutside = (e: MouseEvent) => {
+			if (asideRef.current && !asideRef.current.contains(e.target as Node)) {
+				setIsOpen(false);
 			}
 		};
 
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
-	}, [isOpen, toggleOpen]);
+	}, [isOpen]);
 
-	const handleSubmit = (e: React.FormEvent) => {		
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		setArticleState(formState);
 	};
 
-	const handleReset = (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleReset = () => {
 		setFormState(defaultArticleState);
+		setArticleState(defaultArticleState);
 	};
 
-	const handleChange = (name: keyof ArticleStateType) => (value: OptionType) => {
-		setFormState(prev => ({ ...prev, [name]:value}));
-	};
+	const handleChange =
+		(name: keyof ArticleStateType) => (value: OptionType) => {
+			setFormState((prev) => ({ ...prev, [name]: value }));
+		};
 
 	const asideClasses = clsx(styles.container, {
 		[styles.container_open]: isOpen,
 	});
 
-	const handleArrowClick = (e: React.MouseEvent<HTMLDivElement>) => {
-		e.stopPropagation();
-		toggleOpen();
-	  };
-
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={toggleOpen} />
+			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside ref={asideRef} className={asideClasses}>
 				<form
 					className={styles.form}
@@ -114,7 +104,7 @@ export const ArticleParamsForm = ({
 						onChange={handleChange('contentWidth')}
 						options={contentWidthArr}></Select>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
+						<Button title='Сбросить' onClick={handleReset} type='clear' />
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>

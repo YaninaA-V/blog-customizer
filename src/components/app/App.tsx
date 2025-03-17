@@ -8,13 +8,7 @@ import { defaultArticleState } from '../../constants/articleProps';
 import styles from './app.module.css';
 
 export const App = () => {
-	const [isOpen, setIsOpen] = useState(false);
 	const [articleParams, setArticleParams] = useState(defaultArticleState);
-
-	const handleApply = (params: typeof defaultArticleState) => {
-		setArticleParams(params);
-		setIsOpen(false);
-	};	
 
 	return (
 		<main
@@ -29,10 +23,8 @@ export const App = () => {
 				} as CSSProperties
 			}>
 			<ArticleParamsForm
-				isOpen={isOpen}
-				toggleOpen={() => setIsOpen(!isOpen)}
 				articleState={articleParams}
-				setArticleState={handleApply}			
+				setArticleState={setArticleParams}
 			/>
 			<Article />
 		</main>
